@@ -1,5 +1,5 @@
 ---
-title: "Data behind criticisms against Chicago's School Quality Rating Policy (SQRP)"
+title: "Data behind the criticisms against Chicago's School Quality Rating Policy (SQRP)"
 author: "Aulia Larasati"
 date: "6/1/2021"
 output:
