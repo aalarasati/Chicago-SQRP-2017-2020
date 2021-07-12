@@ -29,7 +29,8 @@ race <- read_excel("race_ethnic_2019-2020.xlsx")
 
 
 # School Accountability Status and Rating 2017-2020
-Measuring and reporting a school's quality to parents provides the ability for parents to choose the best school to meet their child's needs and advocate for improvements. The coexistence between school rating and choice provides the incentives for schools to improve. Based on 2017-2020 data, most elementary schools under Chicago Public Schools are in good standing. The number of schools that need intensive support has also decreased.  
+Measuring and reporting a school's quality to parents provides the ability for parents to choose the best school to meet their child's needs and advocate for improvements. 
+The coexistence between school rating and choice provides the incentives for schools to improve. Based on 2017-2020 data, most elementary schools under Chicago Public Schools are in good standing. The number of schools that need intensive support has also decreased.  
 
 ```{r}
 rating_graph <- sqrp_rating %>% 
@@ -46,7 +47,8 @@ rating_graph <- sqrp_rating %>%
 rating_graph
 ```
 
-When we look more closely at school's rating annually in the past four years, the number of schools that obtain level 3 ratings has only increased by a handful. However, level 2 schools have increased from 2017 to 2018, and the number has persisted in the past two years.  
+When we look more closely at school's rating annually in the past four years, the number of schools that obtain level 3 ratings has only increased by a handful. 
+However, level 2 schools have increased from 2017 to 2018, and the number has persisted in the past two years.  
 
 ```{r}
 status_graph <- sqrp_rating %>% 
@@ -82,7 +84,9 @@ y2020 <- sqrp_rating %>%
   filter(school_year == 2020)
 ```
 
-When we look at elementary school attendance on the percentile of NWEA growth in reading and math, there seems to be a strong positive correlation between the two variables. An increase in attendance rate by 1 percent among schools increases the school's percentile by 5 points in reading and math. Despite the strong correlation, attendance can only explain a small variation of the school's NWEA growth. Specifically, attendance can only explain the variation in NWEA growth percentile in math and reading by eight and nine percent, respectively. Such evidence suggests there are other factors that influence students' test scores.
+When we look at elementary school attendance on the percentile of NWEA growth in reading and math, there seems to be a strong positive correlation between the two variables. 
+An increase in attendance rate by 1 percent among schools increases the school's percentile by 5 points in reading and math. Despite the strong correlation, attendance 
+can only explain a small variation of the school's NWEA growth. Specifically, attendance can only explain the variation in NWEA growth percentile in math and reading by eight and nine percent, respectively. Such evidence suggests there are other factors that influence students' test scores.
 ```{r}
 attendance_math_read <- y2020 %>% 
   pivot_longer(pct_read:pct_math, names_to = "subject", values_to = "percentile") %>% 
@@ -109,7 +113,10 @@ summary(reg_attend_math)
 ## Relationship between FiveEssential Survey to School Ranking
 
 To measure school's climate, a survey titled Five Essential are conducted to 
-teachers, students, and parents grade 4 to 12. In the past four years, most schools are categorized as "well organized" or "organized." Based on the measurement released by SQRP annually, schools have little information and incentives for school equity policies. To look at the school environment in detail, one could search for schools individually through the Illinois report card website, download an application or go to the five-essential website. 
+teachers, students, and parents grade 4 to 12. In the past four years, most schools are categorized as "well organized" or "organized." Based on the measurement released by 
+SQRP annually, schools have little information and incentives for school equity policies. To look at the school environment in detail, one could search for 
+schools individually through the Illinois report card website, download an application or go to the five-essential website. 
+
 ```{r}
 five_ess <- read_excel("Five Essential Survey_SQRP.xlsx")
 
@@ -126,7 +133,12 @@ five_ess_table
 ```
 
 ## Relationship between Race and SQRP Ratings
-One key argument against the current SQRP highlights the racial achievement gap and further reinforces segregation. Based on the SQRP 2020 result, when combined with the school's demographic data, there is a strong negative correlation between the share of African American students with SQRP total score. The share of African American students explains a 13 percent variation in the total SQRP score, which could be considered large compared to other racial/ethnic backgrounds. A larger share of white students strongly correlates with a higher SQRP score, further highlighting the racial gap in the SQRP scoring system. In other words, schools with low SQRP scores are likely schools dominated by African Americans. 
+One key argument against the current SQRP highlights the racial achievement gap and further reinforces segregation. Based on the SQRP 2020 result, 
+when combined with the school's demographic data, there is a strong negative correlation between the share of African American students with SQRP total score. 
+The share of African American students explains a 13 percent variation in the total SQRP score, which could be considered large compared to other racial/ethnic backgrounds. 
+A larger share of white students strongly correlates with a higher SQRP score, further highlighting the racial gap in the SQRP scoring system. 
+In other words, schools with low SQRP scores are likely schools dominated by African Americans. 
+
 ```{r}
 race_2019 <- race %>% 
   select(-school_name) %>% 
