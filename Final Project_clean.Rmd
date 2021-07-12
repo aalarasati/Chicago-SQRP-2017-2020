@@ -1,0 +1,190 @@
+---
+title: "Data behind criticisms against Chicago's School Quality Rating Policy (SQRP)"
+author: "Aulia Larasati"
+date: "6/1/2021"
+output:
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(stringr)
+library(readxl)
+
+```
+
+
+```{r}
+# SQRP ratings in 2018-2020
+sqrp_rating <- read_excel("sqrp_rating_2018-2020.xlsx", 
+    sheet = "long_data")  %>% rename(school_year = schoo_year)
+```
+
+```{r}
+# racial composition in CPS 2019-2020
+race <- read_excel("race_ethnic_2019-2020.xlsx")
+```
+
+
+# School Accountability Status and Rating 2017-2020
+Measuring and reporting a school's quality to parents provides the ability for parents to choose the best school to meet their child's needs and advocate for improvements. The coexistence between school rating and choice provides the incentives for schools to improve. Based on 2017-2020 data, most elementary schools under Chicago Public Schools are in good standing. The number of schools that need intensive support has also decreased.  
+
+```{r}
+rating_graph <- sqrp_rating %>% 
+  group_by(school_year, rating) %>% 
+  summarize(n_school = n()) %>% 
+  ggplot(aes(x = rating, y = n_school, group = school_year)) + 
+  geom_col(aes(fill= school_year), position = "dodge") + 
+  geom_text(aes(x = rating, label = n_school), 
+            position = position_dodge(width = 1), size = 4) + 
+  scale_fill_continuous(low = "gold", high = "darkorange") + 
+  labs(title = "School SQRP Ratings, Academic Year 2017-2020", 
+       x = "SQRP Rating", fill = "school year", y = "number of schools")
+
+rating_graph
+```
+
+When we look more closely at school's rating annually in the past four years, the number of schools that obtain level 3 ratings has only increased by a handful. However, level 2 schools have increased from 2017 to 2018, and the number has persisted in the past two years.  
+
+```{r}
+status_graph <- sqrp_rating %>% 
+  group_by(school_year, status) %>% 
+  summarize(n_school = n()) %>% 
+  ggplot(aes(x = status, y = n_school, group = school_year)) + 
+  geom_col(aes(fill= school_year), position = "dodge") + 
+  geom_text(aes(x = status, label = n_school), 
+            position = position_dodge(width = 1), size = 4) + 
+  scale_fill_continuous(low = "gold", high = "darkorange") + 
+  labs(title = "School Accountability Status, Academic Year 2017-2020", 
+       x = "Accountability Status", fill = "school year", y = "number of schools")
+status_graph
+```
+
+
+```{r}
+tabel1_ranking <- sqrp_rating %>% 
+  group_by(school_year, status) %>% 
+  summarize(n_school = n()) %>% 
+  pivot_wider(names_from = school_year, values_from = n_school) 
+
+tabel1_ranking
+```
+
+## Relationship between attendance and school rating
+```{r}
+y2020 <- sqrp_rating %>% 
+  mutate(attandance_rate = as.numeric(attandance_rate), 
+         pct_read = as.numeric(pct_read), 
+         pct_math = as.numeric(pct_math), 
+         sqrp_total = as.numeric(sqrp_total)) %>% 
+  filter(school_year == 2020)
+```
+
+When we look at elementary school attendance on the percentile of NWEA growth in reading and math, there seems to be a strong positive correlation between the two variables. An increase in attendance rate by 1 percent among schools increases the school's percentile by 5 points in reading and math. Despite the strong correlation, attendance can only explain a small variation of the school's NWEA growth. Specifically, attendance can only explain the variation in NWEA growth percentile in math and reading by eight and nine percent, respectively. Such evidence suggests there are other factors that influence students' test scores.
+```{r}
+attendance_math_read <- y2020 %>% 
+  pivot_longer(pct_read:pct_math, names_to = "subject", values_to = "percentile") %>% 
+  group_by(subject) %>% 
+  ggplot(aes(x = attandance_rate, y = percentile)) + 
+  geom_point(aes(color = subject)) + 
+  geom_smooth(aes(color = subject)) + xlim(90,99) + 
+  labs(title = "Relationship between attendance and NWEA growth in 2020",
+       x = "attendance rate", 
+       y = "National School Growth Percentile", 
+       label = "test subjects", 
+       caption = "Subject: \n 
+       Math: coef = 5.6***, r-squared = 0.08 \n
+       Reading: coef = 5.49***, r-squared = 0.09")
+
+attendance_math_read
+
+reg_attend_read <- lm(pct_read ~ attandance_rate, data = y2020)
+summary(reg_attend_read)
+
+reg_attend_math <- lm(pct_math ~ attandance_rate, data = y2020)
+summary(reg_attend_math)
+```
+## Relationship between FiveEssential Survey to School Ranking
+
+To measure school's climate, a survey titled Five Essential are conducted to 
+teachers, students, and parents grade 4 to 12. In the past four years, most schools are categorized as "well organized" or "organized." Based on the measurement released by SQRP annually, schools have little information and incentives for school equity policies. To look at the school environment in detail, one could search for schools individually through the Illinois report card website, download an application or go to the five-essential website. 
+```{r}
+five_ess <- read_excel("Five Essential Survey_SQRP.xlsx")
+
+five_ess_table <- five_ess %>%
+  mutate(school_year = as.numeric(school_year)) %>%
+  rename(five_ess = five_ess_2020) %>% 
+  filter(!is.na(five_ess)) %>% 
+  group_by(five_ess, school_year) %>% 
+  summarize(n_school = n()) %>% 
+  pivot_wider(names_from = school_year, values_from = n_school)
+
+five_ess_table
+
+```
+
+## Relationship between Race and SQRP Ratings
+One key argument against the current SQRP highlights the racial achievement gap and further reinforces segregation. Based on the SQRP 2020 result, when combined with the school's demographic data, there is a strong negative correlation between the share of African American students with SQRP total score. The share of African American students explains a 13 percent variation in the total SQRP score, which could be considered large compared to other racial/ethnic backgrounds. A larger share of white students strongly correlates with a higher SQRP score, further highlighting the racial gap in the SQRP scoring system. In other words, schools with low SQRP scores are likely schools dominated by African Americans. 
+```{r}
+race_2019 <- race %>% 
+  select(-school_name) %>% 
+  mutate(school_id = as.numeric(school_id))
+
+race_sqrp <- sqrp_rating %>% 
+  filter(school_year == 2019) %>% 
+  left_join(race_2019, by = "school_id")
+```
+
+
+```{r}
+race_sqrp_2019 <- race_sqrp %>% 
+  mutate(pct_african_american = round(african_american/Total, 2), 
+         pct_white = round(white/Total,2), 
+         pct_hispanic = round(hispanic/Total,2), 
+         pct_asian = round(asian/Total,2), 
+         other = multi_racial+hawaii_pacific_islander+native_american_alaskan, 
+         pct_other = round(other/Total,2), 
+         sqrp_total = as.numeric(sqrp_total)
+         ) 
+```
+
+
+```{r}
+#relationship between share of african american and sqrp score 
+race_plot <- race_sqrp_2019 %>% 
+ ggplot(aes(x = pct_african_american, y = sqrp_total)) + geom_point(color = "cyan3") + 
+  geom_smooth(aes(x = pct_african_american, y = sqrp_total), color = "orangered3") + 
+  labs(x = "% african american", y = "total SQRP score",
+       caption = "coeff = -0.547***, R square = 0.135", 
+       title = "Relationship between share of African American Students and SQRP score")
+
+race_plot
+  
+```
+
+
+```{r}
+reg_race_sqrp <- race_sqrp_2019 %>% 
+  select(sqrp_total, pct_african_american:pct_other, -other) %>% 
+  cor(use = "pairwise.complete.obs")
+
+#african american
+reg_aa <- lm(sqrp_total ~ pct_african_american, data = race_sqrp_2019)
+summary(reg_aa)
+#white
+reg_white <- lm(sqrp_total ~ pct_white, data = race_sqrp_2019)
+summary(reg_white)
+#hispanic
+reg_his <- lm(sqrp_total ~ pct_hispanic, data = race_sqrp_2019)
+summary(reg_his)
+#asian
+reg_asian <- lm(sqrp_total ~ pct_asian, data = race_sqrp_2019)
+summary(reg_asian)
+#other
+reg_other <- lm(sqrp_total ~ pct_other, data = race_sqrp_2019)
+summary(reg_other)
+
+```
+
