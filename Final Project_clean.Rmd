@@ -3,8 +3,9 @@ title: "Data behind criticisms against Chicago's School Quality Rating Policy (S
 author: "Aulia Larasati"
 date: "6/1/2021"
 output:
-  html_document: default
+  pdf_document: default
   word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
