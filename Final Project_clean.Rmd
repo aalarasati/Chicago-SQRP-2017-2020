@@ -86,7 +86,10 @@ y2020 <- sqrp_rating %>%
 
 When we look at elementary school attendance on the percentile of NWEA growth in reading and math, there seems to be a strong positive correlation between the two variables. 
 An increase in attendance rate by 1 percent among schools increases the school's percentile by 5 points in reading and math. Despite the strong correlation, attendance 
-can only explain a small variation of the school's NWEA growth. Specifically, attendance can only explain the variation in NWEA growth percentile in math and reading by eight and nine percent, respectively. Such evidence suggests there are other factors that influence students' test scores.
+can only explain a small variation of the school's NWEA growth. 
+Specifically, attendance can only explain the variation in NWEA growth percentile in math and reading by eight and nine percent, respectively. 
+Such evidence suggests there are other factors that influence students' test scores.
+
 ```{r}
 attendance_math_read <- y2020 %>% 
   pivot_longer(pct_read:pct_math, names_to = "subject", values_to = "percentile") %>% 
